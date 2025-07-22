@@ -793,3 +793,295 @@ function removeMemberFromTeam(teamId, userId) {
       alert("Ошибка при удалении участника: " + error.message);
     });
 }
+// Функция для удаления аккаунта пользователя
+function deleteAccount() {
+  const user = firebase.auth().currentUser;
+  if (!user) return;
+
+  // Показываем диалог подтверждения
+  const confirmDelete = confirm(
+    "Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить. Все ваши данные будут удалены."
+  );
+
+  if (!confirmDelete) return;
+
+  // Запрашиваем повторное подтверждение с вводом пароля
+  const password = prompt(
+    "Для подтверждения удаления аккаунта введите свой пароль:"
+  );
+
+  if (!password) {
+    alert("Удаление аккаунта отменено.");
+    return;
+  }
+
+  // Повторно аутентифицируем пользователя перед удалением
+  const credential = firebase.auth.EmailAuthProvider.credential(
+    user.email,
+    password
+  );
+
+  // Повторная аутентификация
+  user
+    .reauthenticateWithCredential(credential)
+    .then(() => {
+      // Получаем ID пользователя для удаления данных
+      const userId = user.uid;
+
+      // Получаем список проектов пользователя
+      return firebase
+        .database()
+        .ref(`userTeams/${userId}`)
+        .once("value")
+        .then((snapshot) => {
+          const userTeams = snapshot.val() || {};
+          const teamIds = Object.keys(userTeams);
+
+          // Создаем массив промисов для удаления пользователя из всех команд
+          const removeFromTeamsPromises = teamIds.map((teamId) => {
+            return firebase
+              .database()
+              .ref(`teams/${teamId}/members/${userId}`)
+              .remove();
+          });
+
+          // Удаляем пользователя из всех команд
+          return Promise.all(removeFromTeamsPromises)
+            .then(() => {
+              // Удаляем данные пользователя из базы данных
+              return firebase.database().ref(`users/${userId}`).remove();
+            })
+            .then(() => {
+              // Удаляем список команд пользователя
+              return firebase.database().ref(`userTeams/${userId}`).remove();
+            })
+            .then(() => {
+              // Удаляем аккаунт пользователя из Firebase Auth
+              return user.delete();
+            });
+        });
+    })
+    .then(() => {
+      // Успешное удаление аккаунта
+      alert("Ваш аккаунт был успешно удален.");
+      // Перенаправляем на страницу авторизации
+      window.location.href = "auth.html";
+    })
+    .catch((error) => {
+      console.error("Ошибка при удалении аккаунта:", error);
+
+      // Обработка различных ошибок
+      if (
+        error.code === "auth/wrong-password" ||
+        error.code === "auth/invalid-credential"
+      ) {
+        alert("Неверный пароль. Удаление аккаунта отменено.");
+      } else if (error.code === "auth/too-many-requests") {
+        alert("Слишком много попыток. Пожалуйста, попробуйте позже.");
+      } else if (error.code === "auth/requires-recent-login") {
+        alert(
+          "Для удаления аккаунта требуется повторная авторизация. Пожалуйста, выйдите из аккаунта и войдите снова."
+        );
+      } else {
+        alert("Произошла ошибка при удалении аккаунта: " + error.message);
+      }
+    });
+}
+
+// Добавляем обработчик для кнопки удаления аккаунта
+document.addEventListener("DOMContentLoaded", function () {
+  const deleteAccountBtn = document.getElementById("deleteAccountBtn");
+  if (deleteAccountBtn) {
+    deleteAccountBtn.addEventListener("click", deleteAccount);
+  }
+});
+// Функция для изменения имени пользователя
+function editUsername() {
+  const user = firebase.auth().currentUser;
+  if (!user) return;
+
+  const currentUsername = document.getElementById("userName").textContent;
+  const newUsername = prompt(
+    "Введите новое имя пользователя:",
+    currentUsername === user.email ? "" : currentUsername
+  );
+
+  if (!newUsername) {
+    return; // Пользователь отменил ввод
+  }
+
+  // Валидация имени пользователя
+  const usernameError = validateUsername(newUsername);
+  if (usernameError) {
+    alert(usernameError);
+    return;
+  }
+
+  // Сохраняем новое имя пользователя
+  firebase
+    .database()
+    .ref(`users/${user.uid}`)
+    .update({
+      username: newUsername,
+      updatedAt: firebase.database.ServerValue.TIMESTAMP,
+    })
+    .then(() => {
+      console.log("Имя пользователя успешно обновлено:", newUsername);
+
+      // Обновляем отображение на странице
+      const userNameEl = document.getElementById("userName");
+      const userInitialsEl = document.getElementById("userInitials");
+
+      userNameEl.textContent = newUsername;
+      userNameEl.classList.add("has-username");
+      userNameEl.classList.remove("no-username");
+
+      // Обновляем инициалы в аватаре
+      updateUserInitials(newUsername);
+
+      alert("Имя пользователя успешно изменено!");
+    })
+    .catch((error) => {
+      console.error("Ошибка при обновлении имени пользователя:", error);
+      alert("Ошибка при изменении имени пользователя: " + error.message);
+    });
+}
+
+// Функция валидации имени пользователя
+function validateUsername(username) {
+  // Проверка на пустое значение
+  if (!username) {
+    return "Имя пользователя не может быть пустым";
+  }
+
+  // Проверка длины (от 3 до 20 символов)
+  if (username.length < 3 || username.length > 20) {
+    return "Имя пользователя должно быть от 3 до 20 символов";
+  }
+
+  // Проверка на допустимые символы (буквы, цифры, подчеркивания и дефисы)
+  const usernameRegex = /^[a-zA-Z0-9_-]+$/;
+  if (!usernameRegex.test(username)) {
+    return "Имя пользователя может содержать только буквы, цифры, подчеркивания и дефисы";
+  }
+
+  // Если все проверки пройдены
+  return null;
+}
+
+// Функция для обновления инициалов пользователя
+function updateUserInitials(name) {
+  const userInitialsEl = document.getElementById("userInitials");
+  if (!userInitialsEl) return;
+
+  let initials = "?";
+
+  if (name && name !== "Загрузка...") {
+    // Если это email, берем первую букву до @
+    if (name.includes("@")) {
+      initials = name.charAt(0).toUpperCase();
+    } else {
+      // Если это username, берем первые буквы слов
+      const words = name.split(/[-_\s]+/);
+      if (words.length >= 2) {
+        initials = (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+      } else {
+        initials = words[0].substring(0, 2).toUpperCase();
+      }
+    }
+  }
+
+  userInitialsEl.textContent = initials;
+}
+
+// Обновляем функцию loadUserData для работы с новой карточкой профиля
+const originalLoadUserData = loadUserData;
+loadUserData = function (userId) {
+  // Показываем индикатор загрузки
+  const userNameEl = document.getElementById("userName");
+  const userEmailEl = document.getElementById("userEmail");
+
+  userNameEl.textContent = "Загрузка...";
+
+  // Получаем текущего пользователя
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    userNameEl.textContent = "Пользователь";
+    userEmailEl.textContent = "";
+    return;
+  }
+
+  // Сохраняем email для отображения в любом случае
+  userEmailEl.textContent = user.email;
+
+  // Запрашиваем данные пользователя из Firebase
+  firebase
+    .database()
+    .ref(`users/${userId}`)
+    .once("value")
+    .then((snapshot) => {
+      const userData = snapshot.val();
+
+      if (userData && userData.username) {
+        // Если имя пользователя найдено, отображаем его
+        userNameEl.textContent = userData.username;
+        userNameEl.classList.add("has-username");
+        userNameEl.classList.remove("no-username");
+
+        // Обновляем инициалы
+        updateUserInitials(userData.username);
+
+        console.log("Отображаем имя пользователя:", userData.username);
+      } else {
+        // Если имя пользователя не найдено, используем email в качестве запасного варианта
+        userNameEl.textContent = user.email;
+        userNameEl.classList.add("no-username");
+        userNameEl.classList.remove("has-username");
+
+        // Обновляем инициалы для email
+        updateUserInitials(user.email);
+
+        console.log(
+          "Имя пользователя не найдено, используем email:",
+          user.email
+        );
+      }
+    })
+    .catch((error) => {
+      console.error("Ошибка при загрузке данных пользователя:", error);
+
+      // В случае ошибки используем полный email в качестве запасного варианта
+      userNameEl.textContent = user.email;
+      userNameEl.classList.add("no-username");
+      userNameEl.classList.remove("has-username");
+
+      // Обновляем инициалы для email
+      updateUserInitials(user.email);
+    });
+};
+
+// Добавляем обработчик для кнопки изменения имени пользователя
+document.addEventListener("DOMContentLoaded", function () {
+  console.log("Ищем кнопку редактирования имени пользователя...");
+  const editUsernameBtn = document.getElementById("editUsernameBtn");
+  console.log("Кнопка найдена:", editUsernameBtn);
+
+  if (editUsernameBtn) {
+    console.log("Добавляем обработчик события для кнопки редактирования имени");
+    editUsernameBtn.addEventListener("click", function () {
+      console.log("Кнопка редактирования имени нажата!");
+      editUsername();
+    });
+  } else {
+    console.error("Кнопка редактирования имени не найдена в DOM!");
+
+    // Добавляем обработчик с задержкой, на случай если DOM обновляется динамически
+    setTimeout(() => {
+      const editUsernameBtnDelayed = document.getElementById("editUsernameBtn");
+      if (editUsernameBtnDelayed) {
+        console.log("Кнопка найдена после задержки!");
+        editUsernameBtnDelayed.addEventListener("click", editUsername);
+      }
+    }, 1000);
+  }
+});

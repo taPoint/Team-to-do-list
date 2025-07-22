@@ -45,87 +45,129 @@ h1 {
   grid-column: 1 / -1;
 }
 
-/* Стили для username, email и кнопки выхода */
-.user-info {
+/* Стили для карточки профиля пользователя */
+.user-profile-card {
   grid-column: 1 / -1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 30px;
+  color: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.profile-avatar {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.username-container {
+  display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 20px;
-  position: relative;
+  margin-bottom: 8px;
 }
 
-.username {
-  text-align: center;
-  font-size: 1.5rem;
+.profile-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.action-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
   font-weight: 600;
-  color: var(--primary);
-  padding: 12px 20px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e9ecef;
-  width: fit-content;
-  max-width: 100%;
+  cursor: pointer;
   transition: all 0.3s ease;
-  margin-bottom: 5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  backdrop-filter: blur(10px);
 }
 
-.username.has-username {
-  color: var(--primary);
-  border-left: 4px solid var(--accent);
-  position: relative;
-  background-color: #e6f7ff;
-  border: 1px solid #91d5ff;
+.logout-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.username.has-username::before {
-  content: "Имя пользователя";
-  position: absolute;
-  top: -8px;
-  left: 10px;
-  font-size: 0.7rem;
-  background: white;
-  padding: 0 5px;
-  color: var(--accent);
-  font-weight: normal;
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
-.username.no-username {
-  color: #666;
+.delete-btn {
+  background: rgba(220, 53, 69, 0.8);
+  color: white;
+  border: 1px solid rgba(220, 53, 69, 0.5);
+}
+
+.delete-btn:hover {
+  background: rgba(220, 53, 69, 1);
+  transform: translateY(-2px);
+}
+
+.edit-username-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.edit-username-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.user-profile-card .username {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.user-profile-card .username.has-username {
+  color: white;
+}
+
+.user-profile-card .username.no-username {
+  color: rgba(255, 255, 255, 0.8);
   font-style: italic;
-  background-color: #f5f5f5;
-  border: 1px solid #d9d9d9;
 }
 
-.user-email {
-  text-align: center;
-  font-size: 0.9rem;
-  color: #6c757d;
-  padding: 8px 16px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e9ecef;
-  width: fit-content;
-  max-width: 100%;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.user-email::before {
-  content: "Email";
-  position: absolute;
-  top: -8px;
-  left: 10px;
-  font-size: 0.7rem;
-  background: white;
-  padding: 0 5px;
-  color: #6c757d;
-  font-weight: normal;
+.user-profile-card .user-email {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-weight: 400;
 }
 
 /* Основной стиль кнопок (кроме специальных) */
@@ -380,5 +422,40 @@ input:focus {
   .username.has-username::before,
   .user-email::before {
     font-size: 0.65rem;
+  }
+}
+/* Стили для контейнера кнопок в user-info */
+.user-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Стили для кнопки удаления аккаунта */
+.delete-account-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.delete-account-btn:hover {
+  background-color: #c82333;
+}
+
+/* Адаптивность для кнопок */
+@media (max-width: 500px) {
+  .user-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  #logoutBtn,
+  .delete-account-btn {
+    width: 100%;
   }
 }

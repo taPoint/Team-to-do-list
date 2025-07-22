@@ -1,20 +1,45 @@
-firebase.auth().onAuthStateChanged((user) => {
-  if (!user) {
-    window.location.href = "auth.html";
-    return;
-  }
+// Проверяем, активен ли демо-режим
+if (localStorage.getItem("demoMode") === "true") {
+  console.log("Запуск приложения в демо-режиме");
 
+  const demoUser = JSON.parse(localStorage.getItem("demoUser"));
   const currentTeam = localStorage.getItem("currentTeam");
-  if (!currentTeam) {
-    window.location.href = "dashboard.html";
-    return;
+
+  if (!demoUser || !currentTeam || currentTeam !== "demo-team") {
+    window.location.href = "auth.html";
+    throw new Error("Некорректные данные демо-режима");
   }
 
-  // Fetch and display username
-  fetchAndDisplayUsername(user);
+  // Отображаем имя пользователя
+  const userNameElement = document.getElementById("userName");
+  if (userNameElement) {
+    userNameElement.textContent = demoUser.username;
+    userNameElement.classList.add("has-username");
+    userNameElement.classList.remove("no-username");
+  }
 
-  initApp(currentTeam);
-});
+  // Инициализируем приложение в демо-режиме
+  initAppDemoMode();
+} else {
+  // Обычный режим с Firebase
+  firebase.auth().onAuthStateChanged((user) => {
+    if (!user) {
+      window.location.href = "auth.html";
+      return;
+    }
+
+    const currentTeam = localStorage.getItem("currentTeam");
+    if (!currentTeam) {
+      window.location.href = "dashboard.html";
+      return;
+    }
+
+    // Fetch and display username
+    fetchAndDisplayUsername(user);
+
+    initApp(currentTeam);
+  });
+}
 
 // Function to fetch and display username
 function fetchAndDisplayUsername(user) {

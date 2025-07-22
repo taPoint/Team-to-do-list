@@ -115,3 +115,39 @@ button:hover {
     align-items: flex-start;
   }
 }
+/* Стили для демо-секции */
+.demo-section {
+  margin-top: 25px;
+  text-align: center;
+}
+
+.demo-divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #ddd, transparent);
+  margin: 20px 0;
+}
+
+.demo-text {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+.demo-btn {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.demo-btn:hover {
+  background: linear-gradient(135deg, #218838, #1ea085);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+}

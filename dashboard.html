@@ -11,10 +11,33 @@
     <div class="dashboard-container">
       <h1>Личный кабинет</h1>
 
-      <div class="user-info">
-        <div class="username" id="userName">Загрузка...</div>
-        <div class="user-email" id="userEmail"></div>
-        <button id="logoutBtn">Выйти из аккаунта</button>
+      <div class="user-profile-card">
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <span id="userInitials">?</span>
+          </div>
+          <div class="profile-info">
+            <div class="username-container">
+              <div class="username" id="userName">Загрузка...</div>
+              <button
+                id="editUsernameBtn"
+                class="edit-username-btn"
+                title="Изменить имя пользователя"
+              >
+                ✎
+              </button>
+            </div>
+            <div class="user-email" id="userEmail"></div>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <button id="logoutBtn" class="action-btn logout-btn">
+            Выйти из аккаунта
+          </button>
+          <button id="deleteAccountBtn" class="action-btn delete-btn">
+            Удалить аккаунт
+          </button>
+        </div>
       </div>
 
       <div class="dashboard-main">
@@ -77,8 +100,11 @@
       firebase.initializeApp(firebaseConfig);
     </script>
 
+    <script src="js/demo_mode.js"></script>
     <script src="js/join_team.js"></script>
     <script src="js/update_username.js"></script>
+    <script src="js/fix_username.js"></script>
     <script src="js/dashboard.js"></script>
+    <script src="js/fix_edit_username.js"></script>
   </body>
 </html>
