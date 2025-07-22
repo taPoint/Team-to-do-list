@@ -1,0 +1,44 @@
+{
+  "rules": {
+    "teams": {
+      ".read": "auth != null",
+      "$teamId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || data.child('createdBy').val() == auth.uid || data.child('members').child(auth.uid).exists())",
+        "members": {
+          "$userId": {
+            ".write": "auth != null && (auth.uid == $userId || root.child('teams').child($teamId).child('createdBy').val() == auth.uid)"
+          }
+        }
+      }
+    },
+    "userTeams": {
+      "$userId": {
+        ".read": "auth != null && auth.uid == $userId",
+        ".write": "auth != null && auth.uid == $userId"
+      }
+    },
+    "joinRequests": {
+      "$requestId": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+    "users": {
+      ".read": "auth != null",
+      "$userId": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid == $userId",
+        "username": {
+          ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 20 && newData.val().matches(/^[a-zA-Z0-9_-]+$/)"
+        },
+        "email": {
+          ".validate": "newData.isString() && newData.val().matches(/^[^@]+@[^@]+\\.[^@]+$/)"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber()"
+        }
+      }
+    }
+  }
+}

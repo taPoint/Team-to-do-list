@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/dashboard.css" />
+    <title>Личный кабинет | Командный To-Do List</title>
+    <link rel="icon" href="css/favicon.ico" type="image/x-icon" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <h1>Личный кабинет</h1>
+
+      <div class="user-info">
+        <div class="username" id="userName">Загрузка...</div>
+        <div class="user-email" id="userEmail"></div>
+        <button id="logoutBtn">Выйти из аккаунта</button>
+      </div>
+
+      <div class="dashboard-main">
+        <div class="my-teams">
+          <h3>Мои проекты</h3>
+          <div id="teamsList"></div>
+        </div>
+
+        <div class="my-teams">
+          <h3>Созданные мной проекты</h3>
+          <div id="createdTeamsList"></div>
+        </div>
+      </div>
+
+      <div class="dashboard-sidebar">
+        <div class="form-group">
+          <h3>Войти в проект</h3>
+          <input type="text" id="teamId" placeholder="ID проекта" />
+          <input
+            type="password"
+            id="teamPassword"
+            placeholder="Пароль проекта"
+          />
+          <button id="joinTeamBtn">Добавить проект</button>
+          <div class="error" id="teamError"></div>
+        </div>
+
+        <div class="form-group">
+          <h3>Создать новый проект</h3>
+          <input type="text" id="newTeamName" placeholder="Название проекта" />
+          <input
+            type="password"
+            id="newTeamPassword"
+            placeholder="Пароль проекта"
+          />
+          <button id="createTeamBtn">Создать проект</button>
+          <div class="error" id="createTeamError"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyCcJmrK_ctL2kj9-w6C-YFJ2RGdXgn_-KI",
+        authDomain: "teamtodolist-a126a.firebaseapp.com",
+        databaseURL:
+          "https://teamtodolist-a126a-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "teamtodolist-a126a",
+        storageBucket: "teamtodolist-a126a.appspot.com",
+        messagingSenderId: "497218007909",
+        appId: "1:497218007909:web:8cabf0a05ae7801909278c",
+      };
+
+      // Инициализация Firebase
+      firebase.initializeApp(firebaseConfig);
+    </script>
+
+    <script src="js/join_team.js"></script>
+    <script src="js/update_username.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

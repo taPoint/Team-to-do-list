@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/auth.css" />
+    <link rel="icon" href="css/favicon.ico" type="image/x-icon" />
+    <title>Авторизация | Командный To-Do List</title>
+  </head>
+  <body>
+    <div class="auth-container">
+      <h1>Командный To-Do List</h1>
+      <p style="text-align: center; margin-bottom: 20px">
+        Для работы с командными задачами войдите или зарегистрируйтесь
+      </p>
+
+      <!-- Форма входа -->
+      <div id="login-form">
+        <div class="form-group">
+          <input type="email" id="login-email" placeholder="Email" required />
+        </div>
+        <div class="form-group">
+          <input
+            type="password"
+            id="login-password"
+            placeholder="Пароль"
+            required
+          />
+        </div>
+        <div id="login-error" class="error"></div>
+        <button id="login-btn">Войти</button>
+        <div class="toggle-form">
+          Нет аккаунта? <a href="#" id="show-register">Зарегистрироваться</a>
+        </div>
+      </div>
+
+      <!-- Форма регистрации -->
+      <div id="register-form" class="hidden">
+        <div class="form-group">
+          <input
+            type="email"
+            id="register-email"
+            placeholder="Email"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <input
+            type="text"
+            id="register-username"
+            placeholder="Имя пользователя"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <input
+            type="password"
+            id="register-password"
+            placeholder="Пароль"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <input
+            type="password"
+            id="register-confirm"
+            placeholder="Повторите пароль"
+            required
+          />
+        </div>
+        <div id="register-error" class="error"></div>
+        <button id="register-btn">Зарегистрироваться</button>
+        <div class="toggle-form">
+          Уже есть аккаунт? <a href="#" id="show-login">Войти</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+      // Твой конфиг Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyCcJmrK_ctL2kj9-w6C-YFJ2RGdXgn_-KI",
+        authDomain: "teamtodolist-a126a.firebaseapp.com",
+        databaseURL:
+          "https://teamtodolist-a126a-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "teamtodolist-a126a",
+        storageBucket: "teamtodolist-a126a.firebasestorage.app",
+        messagingSenderId: "497218007909",
+        appId: "1:497218007909:web:8cabf0a05ae7801909278c",
+      };
+
+      // Инициализация Firebase
+      firebase.initializeApp(firebaseConfig);
+    </script>
+
+    <!-- Основной скрипт -->
+    <script src="js/auth.js"></script>
+  </body>
+</html>

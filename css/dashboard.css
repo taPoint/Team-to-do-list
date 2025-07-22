@@ -1,0 +1,378 @@
+:root {
+  --primary: #4361ee;
+  --secondary: #3f37c9;
+  --accent: #4895ef;
+  --success: #4cc9f0;
+  --danger: #f72585;
+  --light: #f8f9fa;
+  --dark: #212529;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.5;
+  margin: 0;
+  padding: 20px;
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+.dashboard-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 30px;
+}
+
+.dashboard-main {
+  grid-column: 1;
+}
+
+.dashboard-sidebar {
+  grid-column: 2;
+}
+
+h1 {
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 2rem;
+  grid-column: 1 / -1;
+}
+
+/* Стили для username, email и кнопки выхода */
+.user-info {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.username {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary);
+  padding: 12px 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  width: fit-content;
+  max-width: 100%;
+  transition: all 0.3s ease;
+  margin-bottom: 5px;
+}
+
+.username.has-username {
+  color: var(--primary);
+  border-left: 4px solid var(--accent);
+  position: relative;
+}
+
+.username.has-username::before {
+  content: "Имя пользователя";
+  position: absolute;
+  top: -8px;
+  left: 10px;
+  font-size: 0.7rem;
+  background: white;
+  padding: 0 5px;
+  color: var(--accent);
+  font-weight: normal;
+}
+
+.username.no-username {
+  color: var(--secondary);
+  font-style: italic;
+}
+
+.user-email {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #6c757d;
+  padding: 8px 16px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  width: fit-content;
+  max-width: 100%;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.user-email::before {
+  content: "Email";
+  position: absolute;
+  top: -8px;
+  left: 10px;
+  font-size: 0.7rem;
+  background: white;
+  padding: 0 5px;
+  color: #6c757d;
+  font-weight: normal;
+}
+
+/* Основной стиль кнопок (кроме специальных) */
+button {
+  padding: 8px 12px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+button:hover {
+  background: var(--secondary);
+}
+
+/* Кнопка выхода */
+#logoutBtn {
+  background: var(--danger);
+  width: fit-content;
+}
+
+#logoutBtn:hover {
+  background: #d51a6a;
+}
+
+/* Кнопки форм (Добавить/Создать проект) */
+#joinTeamBtn,
+#createTeamBtn {
+  width: 100%;
+}
+
+h3 {
+  color: var(--secondary);
+  font-size: 1.25rem;
+  margin: 20px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--accent);
+}
+
+/* Формы */
+.form-group {
+  box-sizing: border-box;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.error {
+  color: var(--danger);
+  margin: 8px 0;
+  font-size: 0.85rem;
+}
+
+/* Общие стили карточек */
+.team-card {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s;
+}
+
+.team-card:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Стили для "Мои проекты" */
+.team-card .team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+  flex-direction: column;
+}
+
+.team-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--dark);
+  margin: 0;
+}
+
+.team-join-date {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 4px;
+}
+
+.team-buttons {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+/* Стили для "Созданные мной проекты" */
+.created-team-card {
+  background: #f8fbff;
+  border-left: 3px solid var(--accent);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.created-team-card .team-header {
+  margin-bottom: 8px;
+}
+
+.created-team-card .team-meta {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin: 6px 0;
+}
+
+.team-members {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+}
+
+.member-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 0.85rem;
+}
+
+.member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.member-name {
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.member-email {
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Кнопки в карточках */
+.team-open-btn {
+  background: var(--primary);
+}
+
+.team-leave-btn {
+  background: var(--accent);
+}
+
+.team-delete-btn {
+  background: var(--danger);
+}
+
+.remove-member-btn {
+  background: var(--danger);
+  padding: 3px 6px;
+  font-size: 0.7rem;
+}
+
+/* Адаптивность */
+@media (max-width: 800px) {
+  .dashboard-container {
+    grid-template-columns: 1fr;
+    max-width: 600px;
+  }
+
+  .dashboard-sidebar {
+    grid-column: 1;
+    margin-top: 20px;
+  }
+
+  .user-info {
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .user-email {
+    width: auto;
+  }
+
+  #logoutBtn {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-container {
+    padding: 15px;
+  }
+
+  .team-buttons {
+    flex-wrap: wrap;
+  }
+}
+/* Стили для индикатора загрузки */
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.username:empty::after,
+.username:contains("Загрузка...") {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Улучшенные стили для отображения имени пользователя */
+.user-info {
+  position: relative;
+  padding: 10px;
+}
+
+/* Дополнительные стили для адаптивности */
+@media (max-width: 500px) {
+  .username,
+  .user-email {
+    width: 90%;
+    box-sizing: border-box;
+  }
+
+  .username.has-username::before,
+  .user-email::before {
+    font-size: 0.65rem;
+  }
+}

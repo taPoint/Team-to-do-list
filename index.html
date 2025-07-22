@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Командный To-Do List</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="icon" href="css/favicon.ico" type="image/x-icon" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header-bar">
+        <h1>Командный To-Do List</h1>
+        <div class="user-info">
+          <span id="userName" class="user-name">Загрузка...</span>
+          <button id="dashboardBtn" class="dashboard-btn">
+            Личный кабинет
+          </button>
+        </div>
+      </div>
+
+      <div class="add-task">
+        <input type="text" id="taskTitle" placeholder="Заголовок" />
+        <input type="text" id="taskDesc" placeholder="Описание" />
+
+        <select id="taskDifficulty" class="difficulty-select">
+          <option value="1">Быстро</option>
+          <option value="2" selected>Обычная</option>
+          <option value="3">Уделить время</option>
+          <option value="4">Разобраться</option>
+        </select>
+
+        <button id="addTaskBtn">Добавить</button>
+      </div>
+
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">Все</button>
+        <button class="filter-btn" data-filter="active">
+          Активные <span class="task-count" id="activeCount">0</span>
+        </button>
+        <button class="filter-btn" data-filter="completed">
+          Выполненные <span class="task-count" id="completedCount">0</span>
+        </button>
+      </div>
+
+      <div class="tasks">
+        <h2>Активные задачи</h2>
+        <ul id="activeTasks"></ul>
+
+        <h2>Выполненные задачи</h2>
+        <ul id="completedTasks"></ul>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+      // Конфигурация Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyCcJmrK_ctL2kj9-w6C-YFJ2RGdXgn_-KI",
+        authDomain: "teamtodolist-a126a.firebaseapp.com",
+        databaseURL:
+          "https://teamtodolist-a126a-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "teamtodolist-a126a",
+        storageBucket: "teamtodolist-a126a.appspot.com",
+        messagingSenderId: "497218007909",
+        appId: "1:497218007909:web:8cabf0a05ae7801909278c",
+      };
+
+      // Инициализация Firebase
+      firebase.initializeApp(firebaseConfig);
+    </script>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>
