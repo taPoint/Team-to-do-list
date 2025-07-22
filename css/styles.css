@@ -554,6 +554,20 @@ textarea.edit-input {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 200px;
+  transition: all 0.3s ease;
+}
+
+.user-name.has-username {
+  color: var(--primary);
+  background-color: #e6f7ff;
+  border: 1px solid #91d5ff;
+}
+
+.user-name.no-username {
+  color: #666;
+  font-style: italic;
+  background-color: #f5f5f5;
+  border: 1px solid #d9d9d9;
 }
 
 @media (max-width: 600px) {

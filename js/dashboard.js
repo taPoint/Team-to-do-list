@@ -248,6 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Для каждого ID проекта загружаем данные
             let loadedCount = 0;
+
             teamIds.forEach((teamId) => {
               firebase
                 .database()
@@ -391,7 +392,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Функция для получения данных пользователя, включая имя пользователя
   function fetchUserData(userId) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       // Получаем текущего пользователя для сравнения
       const currentUser = firebase.auth().currentUser;
       const isCurrentUser = userId === currentUser.uid;

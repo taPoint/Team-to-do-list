@@ -20,26 +20,49 @@ firebase.auth().onAuthStateChanged((user) => {
 function fetchAndDisplayUsername(user) {
   const userNameElement = document.getElementById("userName");
 
+  // Set loading state
+  userNameElement.textContent = "Загрузка...";
+
+  // Add timeout to handle network issues
+  const timeoutPromise = new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ timedOut: true });
+    }, 5000); // 5 second timeout
+  });
+
   // First try to get username from database
-  firebase
-    .database()
-    .ref(`users/${user.uid}`)
-    .once("value")
-    .then((snapshot) => {
+  Promise.race([
+    firebase.database().ref(`users/${user.uid}`).once("value"),
+    timeoutPromise,
+  ])
+    .then((result) => {
+      // Check if this was a timeout
+      if (result.timedOut) {
+        console.warn("Username fetch timed out, using fallback");
+        throw new Error("Timeout fetching username");
+      }
+
+      const snapshot = result;
       const userData = snapshot.val();
 
       if (userData && userData.username) {
         // Display username if available
         userNameElement.textContent = userData.username;
+        userNameElement.classList.add("has-username");
+        userNameElement.classList.remove("no-username");
       } else {
         // Fall back to email if username is not available
         userNameElement.textContent = user.email;
+        userNameElement.classList.add("no-username");
+        userNameElement.classList.remove("has-username");
       }
     })
     .catch((error) => {
       console.error("Error fetching username:", error);
       // Fall back to email on error
       userNameElement.textContent = user.email;
+      userNameElement.classList.add("no-username");
+      userNameElement.classList.remove("has-username");
     });
 }
 
