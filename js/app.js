@@ -18,8 +18,25 @@ if (localStorage.getItem("demoMode") === "true") {
     userNameElement.classList.remove("no-username");
   }
 
-  // Инициализируем приложение в демо-режиме
-  initAppDemoMode();
+  // Проверяем, определена ли функция initAppDemoMode
+  if (typeof initAppDemoMode === "function") {
+    // Инициализируем приложение в демо-режиме
+    initAppDemoMode();
+  } else {
+    console.error(
+      "Функция initAppDemoMode не определена! Проверьте порядок загрузки скриптов."
+    );
+
+    // Добавляем обработчик для кнопки добавления задачи как запасной вариант
+    const addTaskBtn = document.getElementById("addTaskBtn");
+    if (addTaskBtn) {
+      addTaskBtn.addEventListener("click", () => {
+        alert(
+          "Демо-режим инициализирован некорректно. Пожалуйста, обновите страницу."
+        );
+      });
+    }
+  }
 } else {
   // Обычный режим с Firebase
   firebase.auth().onAuthStateChanged((user) => {

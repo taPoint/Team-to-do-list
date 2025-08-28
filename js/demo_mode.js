@@ -137,6 +137,7 @@ if (isDemoMode()) {
                     resolve({
                       val: () => ({
                         name: demoTeam.name,
+                        createdBy: getDemoUser().uid,
                         members: { [getDemoUser().uid]: true },
                         tasks: demoTeam.tasks,
                       }),
@@ -155,16 +156,24 @@ if (isDemoMode()) {
                   }
                 } else if (path.startsWith("userTeams/")) {
                   // Запрос списка команд пользователя
-                  resolve({
-                    val: () => ({
-                      "demo-team": {
-                        teamId: "demo-team",
-                        teamName: "Демо-проект",
-                        joinedAt: Date.now() - 86400000,
-                      },
-                    }),
-                    exists: () => true,
-                  });
+                  const demoUser = getDemoUser();
+                  if (path === `userTeams/${demoUser.uid}`) {
+                    resolve({
+                      val: () => ({
+                        "demo-team": {
+                          teamId: "demo-team",
+                          teamName: "Демо-проект",
+                          joinedAt: Date.now() - 86400000,
+                        },
+                      }),
+                      exists: () => true,
+                    });
+                  } else {
+                    resolve({
+                      val: () => null,
+                      exists: () => false,
+                    });
+                  }
                 } else {
                   resolve({
                     val: () => null,
@@ -272,10 +281,32 @@ function exitDemoMode() {
   window.location.href = "auth.html";
 }
 
-// Добавляем кнопку выхода из демо-режима, если мы в демо-режиме
+// Добавляем кнопку выхода из демо-режима и отключаем создание проектов в демо-режиме
 document.addEventListener("DOMContentLoaded", function () {
   if (isDemoMode()) {
-    console.log("Инициализация демо-режима на странице...");
+    // Отключаем создание проектов в демо-режиме
+    if (window.location.pathname.includes("dashboard.html")) {
+      const createTeamBtn = document.getElementById("createTeamBtn");
+      const joinTeamBtn = document.getElementById("joinTeamBtn");
+      const createTeamError = document.getElementById("createTeamError");
+      const teamError = document.getElementById("teamError");
+
+      if (createTeamBtn) {
+        createTeamBtn.disabled = true;
+        createTeamBtn.style.opacity = "0.5";
+        createTeamBtn.style.cursor = "not-allowed";
+        createTeamError.textContent = "Недоступно в демо-режиме";
+        createTeamError.style.color = "#888";
+      }
+
+      if (joinTeamBtn) {
+        joinTeamBtn.disabled = true;
+        joinTeamBtn.style.opacity = "0.5";
+        joinTeamBtn.style.cursor = "not-allowed";
+        teamError.textContent = "Недоступно в демо-режиме";
+        teamError.style.color = "#888";
+      }
+    }
 
     // Добавляем индикатор демо-режима
     const container = document.querySelector(
@@ -334,3 +365,294 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   }
 });
+// Функция инициализации приложения в демо-режиме
+function initAppDemoMode() {
+  console.log("Инициализация приложения в демо-режиме");
+
+  const demoTeam = getDemoTeam();
+  if (!demoTeam) {
+    console.error("Демо-команда не найдена");
+    return;
+  }
+
+  // Получаем элементы DOM
+  const taskTitleInput = document.getElementById("taskTitle");
+  const taskDescInput = document.getElementById("taskDesc");
+  const addTaskBtn = document.getElementById("addTaskBtn");
+  const activeTasksList = document.getElementById("activeTasks");
+  const completedTasksList = document.getElementById("completedTasks");
+  const filterButtons = document.querySelectorAll(".filter-btn");
+  const taskDifficultySelect = document.getElementById("taskDifficulty");
+
+  // Настраиваем селектор сложности
+  if (taskDifficultySelect) {
+    taskDifficultySelect.addEventListener("change", function () {
+      const value = this.value;
+      this.className = `difficulty-select difficulty-${value}`;
+    });
+    taskDifficultySelect.className = `difficulty-select difficulty-${taskDifficultySelect.value}`;
+  }
+
+  // Настраиваем фильтрацию задач
+  let currentFilter = "all";
+
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      filterButtons.forEach((btn) => btn.classList.remove("active"));
+      button.classList.add("active");
+      currentFilter = button.dataset.filter;
+      applyFilter();
+    });
+  });
+
+  function applyFilter() {
+    const allTasks = document.querySelectorAll(".tasks li");
+
+    allTasks.forEach((task) => {
+      const isCompleted = task.classList.contains("completed");
+
+      switch (currentFilter) {
+        case "active":
+          task.style.display = isCompleted ? "none" : "flex";
+          break;
+        case "completed":
+          task.style.display = isCompleted ? "flex" : "none";
+          break;
+        default:
+          task.style.display = "flex";
+      }
+    });
+  }
+
+  // Добавление задачи
+  if (addTaskBtn) {
+    addTaskBtn.addEventListener("click", () => {
+      const title = taskTitleInput.value.trim();
+      const description = taskDescInput.value.trim();
+      const difficulty = taskDifficultySelect.value;
+
+      if (!title) {
+        alert("Введите заголовок!");
+        return;
+      }
+
+      const newTask = {
+        title,
+        description,
+        difficulty: parseInt(difficulty),
+        completed: false,
+        createdAt: Date.now(),
+        completedAt: null,
+      };
+
+      // Добавляем задачу в локальное хранилище
+      const demoTeam = getDemoTeam();
+      const taskId = "demo-task-" + Date.now();
+
+      if (!demoTeam.tasks) {
+        demoTeam.tasks = {};
+      }
+
+      demoTeam.tasks[taskId] = newTask;
+      localStorage.setItem("demoTeam", JSON.stringify(demoTeam));
+
+      // Очищаем поля ввода
+      taskTitleInput.value = "";
+      taskDescInput.value = "";
+
+      // Отображаем новую задачу
+      renderTask(taskId, newTask);
+
+      // Обновляем счетчики
+      updateTaskCounters();
+
+      console.log("Задача добавлена в демо-режиме:", newTask);
+    });
+  }
+
+  // Отображение задач
+  function renderTask(taskId, task) {
+    const li = document.createElement("li");
+    li.classList.add(`difficulty-${task.difficulty || 2}`);
+    if (task.completed) li.classList.add("completed");
+
+    const isNew = Date.now() - task.createdAt < 60000;
+    if (isNew) li.classList.add("new-task");
+
+    li.innerHTML = `
+      <div class="task-content">
+        <strong class="task-title">${task.title}</strong>
+        <p class="task-desc">${task.description || "—"}</p>
+        <span class="task-difficulty">${getDifficultyName(
+          task.difficulty
+        )}</span>
+        <span class="task-time">
+          Добавлено: ${new Date(task.createdAt).toLocaleString()}
+          ${
+            task.completedAt
+              ? `<br>Выполнено: ${new Date(task.completedAt).toLocaleString()}`
+              : ""
+          }
+        </span>
+      </div>
+      <div class="task-meta">
+        <div class="task-actions">
+          ${
+            !task.completed
+              ? `
+            <button class="complete-btn" data-id="${taskId}">✓</button>
+            <button class="edit-btn" data-id="${taskId}">✎</button>
+          `
+              : `
+            <button class="reopen-btn" data-id="${taskId}">↩</button>
+          `
+          }
+          <button class="delete-btn" data-id="${taskId}">✕</button>
+        </div>
+      </div>
+    `;
+
+    // Добавляем обработчики событий для кнопок
+    const completeBtn = li.querySelector(".complete-btn");
+    if (completeBtn) {
+      completeBtn.addEventListener("click", () => {
+        const demoTeam = getDemoTeam();
+        demoTeam.tasks[taskId].completed = true;
+        demoTeam.tasks[taskId].completedAt = Date.now();
+        localStorage.setItem("demoTeam", JSON.stringify(demoTeam));
+
+        // Перерисовываем задачи
+        loadTasks();
+      });
+    }
+
+    const reopenBtn = li.querySelector(".reopen-btn");
+    if (reopenBtn) {
+      reopenBtn.addEventListener("click", () => {
+        const demoTeam = getDemoTeam();
+        demoTeam.tasks[taskId].completed = false;
+        demoTeam.tasks[taskId].completedAt = null;
+        localStorage.setItem("demoTeam", JSON.stringify(demoTeam));
+
+        // Перерисовываем задачи
+        loadTasks();
+      });
+    }
+
+    const editBtn = li.querySelector(".edit-btn");
+    if (editBtn) {
+      editBtn.addEventListener("click", () => {
+        const title = prompt("Введите новый заголовок:", task.title);
+        if (!title) return;
+
+        const description = prompt(
+          "Введите новое описание:",
+          task.description || ""
+        );
+
+        const demoTeam = getDemoTeam();
+        demoTeam.tasks[taskId].title = title;
+        demoTeam.tasks[taskId].description = description;
+        localStorage.setItem("demoTeam", JSON.stringify(demoTeam));
+
+        // Перерисовываем задачи
+        loadTasks();
+      });
+    }
+
+    const deleteBtn = li.querySelector(".delete-btn");
+    if (deleteBtn) {
+      deleteBtn.addEventListener("click", () => {
+        if (confirm("Удалить задачу?")) {
+          const demoTeam = getDemoTeam();
+          delete demoTeam.tasks[taskId];
+          localStorage.setItem("demoTeam", JSON.stringify(demoTeam));
+
+          // Перерисовываем задачи
+          loadTasks();
+        }
+      });
+    }
+
+    if (task.completed) {
+      completedTasksList.appendChild(li);
+    } else {
+      activeTasksList.appendChild(li);
+    }
+  }
+
+  // Загрузка задач
+  function loadTasks() {
+    // Очищаем списки задач
+    activeTasksList.innerHTML = "";
+    completedTasksList.innerHTML = "";
+
+    const demoTeam = getDemoTeam();
+    if (!demoTeam || !demoTeam.tasks) return;
+
+    // Преобразуем объект задач в массив
+    const tasksArray = Object.entries(demoTeam.tasks);
+
+    // Разделяем задачи на активные и выполненные
+    const activeTasks = tasksArray.filter(([_, task]) => !task.completed);
+    const completedTasks = tasksArray.filter(([_, task]) => task.completed);
+
+    // Обновляем счетчики
+    document.getElementById("activeCount").textContent = activeTasks.length;
+    document.getElementById("completedCount").textContent =
+      completedTasks.length;
+
+    // Сортируем активные по дате создания (новые сверху)
+    activeTasks.sort((a, b) => b[1].createdAt - a[1].createdAt);
+
+    // Сортируем выполненные по дате выполнения (новые сверху)
+    completedTasks.sort((a, b) => {
+      if (b[1].completedAt && a[1].completedAt) {
+        return b[1].completedAt - a[1].completedAt;
+      }
+      return 0;
+    });
+
+    // Отображаем задачи
+    activeTasks.forEach(([taskId, task]) => renderTask(taskId, task));
+    completedTasks.forEach(([taskId, task]) => renderTask(taskId, task));
+
+    // Применяем текущий фильтр
+    applyFilter();
+  }
+
+  // Обновление счетчиков задач
+  function updateTaskCounters() {
+    const demoTeam = getDemoTeam();
+    if (!demoTeam || !demoTeam.tasks) return;
+
+    const tasks = Object.values(demoTeam.tasks);
+    const activeTasksCount = tasks.filter((task) => !task.completed).length;
+    const completedTasksCount = tasks.filter((task) => task.completed).length;
+
+    document.getElementById("activeCount").textContent = activeTasksCount;
+    document.getElementById("completedCount").textContent = completedTasksCount;
+  }
+
+  // Функция для получения названия сложности
+  function getDifficultyName(level) {
+    const names = {
+      1: "Быстро",
+      2: "Обычная",
+      3: "Уделить время",
+      4: "Разобраться",
+    };
+    return names[level] || "Не указана";
+  }
+
+  // Загружаем задачи при инициализации
+  loadTasks();
+
+  // Настраиваем кнопку перехода в личный кабинет
+  const dashboardBtn = document.getElementById("dashboardBtn");
+  if (dashboardBtn) {
+    dashboardBtn.addEventListener("click", () => {
+      window.location.href = "dashboard.html";
+    });
+  }
+}

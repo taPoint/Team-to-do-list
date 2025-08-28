@@ -1,10 +1,8 @@
-// Скрипт для исправления проблемы с отображением имени пользователя
+// Скрипт для управления именем пользователя
 document.addEventListener("DOMContentLoaded", function () {
   // Проверяем, авторизован ли пользователь
   firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
-      console.log("Запуск диагностики имени пользователя для:", user.uid);
-
       // Проверяем наличие имени пользователя в базе данных
       checkUsername(user.uid);
     }
@@ -19,26 +17,14 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((snapshot) => {
         const userData = snapshot.val();
 
-        console.log("Данные пользователя:", userData);
-
         if (!userData) {
-          console.log(
-            "Пользователь не найден в базе данных, создаем запись..."
-          );
           showUsernameForm(userId, null);
         } else if (!userData.username) {
-          console.log(
-            "Имя пользователя не установлено, предлагаем установить..."
-          );
           showUsernameForm(userId, userData.email);
         } else {
-          console.log("Имя пользователя найдено:", userData.username);
           // Проверяем, отображается ли имя пользователя правильно
           const userNameEl = document.getElementById("userName");
           if (userNameEl && userNameEl.textContent !== userData.username) {
-            console.log(
-              "Имя пользователя отображается неправильно, обновляем..."
-            );
             userNameEl.textContent = userData.username;
             userNameEl.classList.add("has-username");
             userNameEl.classList.remove("no-username");
@@ -219,8 +205,6 @@ document.addEventListener("DOMContentLoaded", function () {
       .ref(`users/${userId}`)
       .update(userData)
       .then(() => {
-        console.log("Имя пользователя успешно сохранено:", username);
-
         // Обновляем отображение имени пользователя на странице
         const userNameEl = document.getElementById("userName");
         if (userNameEl) {

@@ -235,11 +235,12 @@ function startDemoMode() {
   console.log("Запуск демо-режима...");
 
   // Устанавливаем флаг демо-режима
+  const demoUserId = "demo-user-" + Date.now();
   localStorage.setItem("demoMode", "true");
   localStorage.setItem(
     "demoUser",
     JSON.stringify({
-      uid: "demo-user-" + Date.now(),
+      uid: demoUserId,
       email: "demo@example.com",
       username: "Демо-пользователь",
     })
@@ -249,6 +250,10 @@ function startDemoMode() {
   const demoTeam = {
     id: "demo-team",
     name: "Демо-проект",
+    createdBy: demoUserId,
+    members: {
+      [demoUserId]: true,
+    },
     tasks: {
       "demo-task-1": {
         title: "Добро пожаловать в демо-режим!",
@@ -276,8 +281,19 @@ function startDemoMode() {
     },
   };
 
+  // Создаем демо-данные для личного кабинета
+  const userTeams = {};
+  userTeams[demoUserId] = {
+    "demo-team": {
+      teamId: "demo-team",
+      teamName: "Демо-проект",
+      joinedAt: Date.now() - 86400000, // 1 день назад
+    },
+  };
+
   localStorage.setItem("demoTeam", JSON.stringify(demoTeam));
   localStorage.setItem("currentTeam", "demo-team");
+  localStorage.setItem("demoUserTeams", JSON.stringify(userTeams));
 
   // Перенаправляем на главную страницу
   window.location.href = "index.html";
